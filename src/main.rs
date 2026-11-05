@@ -18,9 +18,10 @@ use axum_extra::{
 use clap::Parser;
 use jsonwebtoken as jwt;
 use openidconnect::{core::CoreProviderMetadata, reqwest::Client, IssuerUrl, JsonWebKey as _};
-use rand_core::RngCore;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use serde_json::json;
+use ssh_key::rand_core::OsRng;
+use ssh_key::rand_core::RngCore;
 use tracing::{debug, error, info};
 
 pub mod built_info {
@@ -421,7 +422,7 @@ async fn sign(
         .as_secs();
     let valid_before = valid_after + (60 * 60 * 12);
     let mut cert_builder = ssh_key::certificate::Builder::new_with_random_nonce(
-        &mut rand_core::OsRng,
+        &mut OsRng,
         &payload.public_key,
         valid_after,
         valid_before,
@@ -439,7 +440,7 @@ async fn sign(
         .key_id(claims.email()?)
         .context("Could not set key ID.")?;
     cert_builder
-        .serial(rand_core::OsRng.next_u64())
+        .serial(OsRng.next_u64())
         .context("Could not set serial number.")?;
     for extension in &state.config.extensions {
         cert_builder
