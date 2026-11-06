@@ -237,4 +237,4 @@ EOF
 done
 
 header "Starting conch chart"
-podman kube play --replace --network=host temp/conch-chart.yaml
+podman kube play --replace --network=podman-default-kube-network temp/conch-chart.yaml
