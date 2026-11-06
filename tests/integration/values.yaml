@@ -25,5 +25,4 @@ config:
 image:
   registry: localhost
   tag: latest
-hostPort: 3000
 log_level: debug
