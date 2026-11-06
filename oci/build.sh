@@ -5,39 +5,29 @@ set -euo pipefail
 
 # Build the project and create an OCI image containing it.
 
-function artifact_path {
-  echo "${1}" | jq --raw-output 'select(.reason == "compiler-artifact") | select(.target.name == "'"${2}"'") | .executable'
-}
+repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+cd "${repo_root}"
 
-case "$(uname -m)" in
-  x86_64)
-    rust_target=x86_64-unknown-linux-musl
-    image_arch=amd64
-    ;;
-  arm64|aarch64)
-    rust_target=aarch64-unknown-linux-musl
-    image_arch=arm64
-    ;;
-  *)
-    echo "Unsupported host architecture: $(uname -m)" >&2
-    exit 1
-    ;;
-esac
+profile=debug
+for arg in "$@"; do
+  case "${arg}" in
+    --release) profile=release ;;
+    *)
+      echo "Unsupported build argument: ${arg}" >&2
+      exit 2
+      ;;
+  esac
+done
 
-out=$(cargo build --target="${rust_target}" --message-format=json ${@-})
-cp "$(artifact_path "${out}" "conch")" oci
+podman build --file oci/Containerfile --build-arg "CARGO_PROFILE=${profile}" \
+  --tag=conch:latest \
+  --annotation="org.opencontainers.image.source=https://github.com/isambard-sc/conch" \
+  --annotation="org.opencontainers.image.description=Conch SSH CA" \
+  --annotation="org.opencontainers.image.licenses=MIT" \
+  .
 
-cd oci
-
-version=$(./conch --version | tail -n1 | cut -d' ' -f 2)
-image_id=$(
-  podman build . --platform="linux/${image_arch}" --tag=conch:latest --tag=conch:"${version}" \
-    --annotation="org.opencontainers.image.source=https://github.com/isambard-sc/conch" \
-    --annotation="org.opencontainers.image.description=Conch SSH CA" \
-    --annotation="org.opencontainers.image.licenses=MIT" \
-    | tee /dev/fd/2 \
-    | tail -n1
-)
-rm conch
+version=$(podman run --rm conch:latest --version | tail -n1 | cut -d' ' -f 2)
+podman tag conch:latest conch:"${version}"
+image_id=$(podman image inspect --format '{{.Id}}' conch:latest)
 echo "Built conch image:" 1>&2
 echo "${image_id}"
