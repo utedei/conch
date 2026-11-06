@@ -1,5 +1,5 @@
 <!--
-SPDX-FileCopyrightText: © 2026 Your Name <you@example.com>
+SPDX-FileCopyrightText: © 2026 Ute Deittert <ute.deittert@bristol.ac.uk>
 SPDX-License-Identifier: CC-BY-SA-4.0
 -->
 
@@ -116,7 +116,7 @@ reuse lint
 
 ## Submitting changes
 
-1. Fork the repository and create a branch from `master`.
+1. Clone the repository and create a branch from `master`.
 2. Make your change, with tests where practical.
 3. Run the checks above and add a changelog entry.
 4. Open a pull request describing what changed and why.
