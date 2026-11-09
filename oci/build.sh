@@ -19,7 +19,18 @@ for arg in "$@"; do
   esac
 done
 
-podman build --file oci/Containerfile --build-arg "CARGO_PROFILE=${profile}" \
+case "$(podman info --format '{{.Host.Arch}}')" in
+  amd64) rust_target=x86_64-unknown-linux-musl ;;
+  arm64) rust_target=aarch64-unknown-linux-musl ;;
+  *)
+    echo "Unsupported Podman architecture: $(podman info --format '{{.Host.Arch}}')" >&2
+    exit 1
+    ;;
+esac
+
+podman build --file oci/Containerfile \
+  --build-arg "CARGO_PROFILE=${profile}" \
+  --build-arg "RUST_TARGET=${rust_target}" \
   --tag=conch:latest \
   --annotation="org.opencontainers.image.source=https://github.com/isambard-sc/conch" \
   --annotation="org.opencontainers.image.description=Conch SSH CA" \
