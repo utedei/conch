@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+### Fixed
+
+- Dependency updates
+    - quinn-proto 0.11.6 -> 0.11.15
+    - rustls-webpki 0.103.8 -> 0.103.13
+    - time 0.3.37 -> 0.3.47
+    - ring 0.17.8 -> 0.17.12
+    - bytes 1.10.0 -> 1.11.1
+    - jsonwebtoken 9.3.1 -> 10.3.0
+    - rustls 0.23.23 -> 0.23.45
+    - serde_with 3.12.0 -> 3.21.0
+    - rsa 0.9.7 -> 0.9.10
+    - git2 0.20.0 -> 0.20.4
+    - tokio 1.43.0 -> 1.43.1
+    - tracing-subscriber 0.3.19 -> 0.3.20
+    - rand 0.8.5 -> 0.8.6
+
 ### Changed
 
 - Conch now returns version 3 of the certificate sign response.
